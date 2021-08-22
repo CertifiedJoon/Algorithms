@@ -42,6 +42,17 @@ class LinkedList:
     def get_tail(self):
         return self._tail
     
+    def set_tail(self, new_tail):
+        self._tail = new_tail
+    
+    def get_length(self):
+        length = 0
+        curr = self._head
+        while(curr is not None):
+            length += 1
+            curr = curr.get_next()
+        return length
+    
     def add(self, e):
         if isinstance(e, Node):
             if self._head == None:
