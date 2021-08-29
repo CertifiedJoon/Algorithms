@@ -14,6 +14,7 @@ class Solution(object):
                 lps[i] = 0
                 i += 1
         return lps
+    
     def kmp(self, haystack, needle):
         m = len(haystack)
         n = len(needle)
