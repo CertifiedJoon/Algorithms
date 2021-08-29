@@ -69,24 +69,22 @@ def calc_lps(needle):
     return ret
     
 # BM Search
-def boyer_moore_search(haystack, needle):
+def boyer_moore_search_bad_char(haystack, needle):
     bad_char = bad_char_heurestics(needle)
     m = len(haystack)
     n = len(needle)
-    i = j = n - 1
-    while (i < m):
-        if haystack[i] == needle[j]:
-            i -= 1
-            j -= 1 
+    s = 0
+    while (s <= m - n):
+        j = n - 1
+        while j >= 0 and haystack[s + j] == needle[j]:
+            j -= 1
         if j == -1:
-            return i + 1
-        if i >= 0 and haystack[i] != needle[j]:
-            if bad_char[ord(haystack[i])] == -1:
-                i += n
-                j = n -1
+            return s
+        else:
+            if bad_char[ord(haystack[s + j])] == -1:
+                s += n
             else:
-                j = n - 1
-                i += max(1, n - 1 - bad_char[ord(haystack[i])])
+                s += max(1, j - bad_char[ord(haystack[s + j])])
     return -1
 
 def bad_char_heurestics(needle):
@@ -111,7 +109,7 @@ class Test(unittest.TestCase):
         ("When the hash value of the pattern matches with the hash value of a window of the text but the window is not the actual pattern then it is called a spurious hit.Spurious hit increases the time complexity of the algorithm. In order to minimize spurious hit, we use modulus. It greatly reduces the spurious hit.", "helloworld", -1)
     ]
     test_cases_random = [
-        ("AAAAAAAAAAAAAAA","AAAAAAA", 0),
+        ("AAAAAAAAAAAAAAA","BBA", -1),
     ]
 
     for _ in range(10):
@@ -125,7 +123,7 @@ class Test(unittest.TestCase):
     test_functions = [
         rabin_karp_search,
         knuth_morris_pratt_search,
-        boyer_moore_search
+        boyer_moore_search_bad_char
     ]
     
     def test_pattern_search(self):
