@@ -82,7 +82,7 @@ def boyer_moore_search_bad_char(haystack, needle):
             return s
         else:
             if bad_char[ord(haystack[s + j])] == -1:
-                s += n
+                s += j + 1
             else:
                 s += max(1, j - bad_char[ord(haystack[s + j])])
     return -1
@@ -110,15 +110,18 @@ class Test(unittest.TestCase):
     ]
     test_cases_random = [
         ("AAAAAAAAAAAAAAA","BBA", -1),
+        ("AAAAAAAAAAAAAA", "AAAAAAAAB", -1),
+        ("aaaaaabbbbba", "bbbbb", 6)
     ]
 
-    for _ in range(10):
+    for _ in range(10000):
         temp = random.choices(range(97, 123), k=random.randrange(10,20))
         random_str = "".join([chr(e) for e in temp])
         start = random.randrange(0, len(random_str) // 2)
         end = random.randrange(len(random_str)//2, len(random_str) + 1)
         test_cases_random.append((random_str, "asdf1dca", -1))
-        test_cases_random.append((random_str, random_str[start:end], start))
+        
+        test_cases_random.append((random_str, random_str[start:end], random_str.find(random_str[start:end])))
     
     test_functions = [
         rabin_karp_search,
@@ -127,7 +130,7 @@ class Test(unittest.TestCase):
     ]
     
     def test_pattern_search(self):
-        num_runs = 1000
+        num_runs = 1
         function_runtimes = defaultdict(float)
         
         for _ in range(num_runs):
