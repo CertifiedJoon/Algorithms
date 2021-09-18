@@ -5,7 +5,7 @@ import random
 import unittest
 
 class DirectedGraph:
-    def __init__(self, adj=None):
+    def __init__(self, adj = None):
         self._adjacency_list = adj
     
     def add_node(self, src, des):
@@ -33,7 +33,7 @@ class DirectedGraph:
                         next_step.append(v)
             frontier = next_step
             i +=1 
-    return level, parents
+        return level, parents
 
 
     def dfs(self):
@@ -73,43 +73,39 @@ class DirectedGraph:
                 parents[vertex] = s 
                 self.dfs_visit(vertex, parents)
                 
-    def contains_cycle(self):
-        to_visit_stack = []
-        
-        for vertex in self:
-            visited = set()
-            to_visit_stack.append(vertex)
-            while to_visit_stack:
-                v = to_visit_stack.pop()
-
-                for neighbor in self._adjacency_list[v]:
-                    if neighbor not in visited:
-                        visited.add(neighbor)
-                        to_visit_stack.append(neighbor)
-                    else:
-                        return False
-        return True
+    def contains_cycle(self, 1):
+        to_visit = []
+        visited = set()
+        popped = set()
+        for s in self:
+            to_visit.append(s)
+            while to_visit:
+                anc = to_visit.pop()
+                popped.append(anc)
+                for chd in self._adjacency_list[anc]:
+                    if chd in popped:
+                        return True
+                    if chd not in visited:
+                        to_visit.append(chd)
+        return False
     
     def topological_sort(self):
-        STATUS_STARTED = 1
-        STATUS_FINISHED = 0
-        statuses = {}
         order = []
-        
-        for vertex in self:
-            to_visit = [vertex]
-            if vertex in statuses:
-                if statuses[vertex] = STATUS_STARTED:
-                    statuses[vertex] = STATUS_FINISHED
-                    order.append(vertex)
-            else:
-                statuses[vertex] = STATUS_STARTED
-                to_visit.append(vertex)
-            
-            to_visit.extend([neighbor for neighbor in self._adjacency_list[vertex] if neighbor not in statuses])
-        
-        order.reverse()
-        
+        visited = set()
+        for s in self:
+            to_visit.append(s)
+            while to_visit:
+                anc = to_visit.pop()
+                order.append(anc)
+                for chd in self._adjacency_list[anc]:
+                    if chd not in visited:
+                        to_visit.append(chd)
         return order
-    
-        
+
+if __name__ == "__main__":
+    dg = DirectedGraph({1: {2,3}, 2: {4, 5}, 3: {6}, 4: {7}, 5: {7}, 6: {5, 7}, 7:{2}})
+    print(dg.bfs())
+    print(dg.dfs())
+    print(dg.rec_dfs())
+    print(dg.contains_cycle())
+    print(dg.topological_sort())
