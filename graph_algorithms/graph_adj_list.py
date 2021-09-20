@@ -101,6 +101,29 @@ class DirectedGraph:
                     if chd not in visited:
                         to_visit.append(chd)
         return order
+    
+    def korasaju_scc(self):
+        order = self.topological_sort()
+        reversed_graph = self.reversed()
+        visited = set()
+        scc = []
+        
+        while order:
+            connected = []
+            vertex = order.pop()
+            visited.add(vertex)
+            dfs_q = queue.Queue()
+            dfs_q.put(vertex)
+            while dfs_q:
+                poped = dfs_q.get()
+                connected.append(poped)
+                for nb in reversed_graph[poped]:
+                    if nb not in visited:
+                        dfs_q.put(nb)
+                        visited.add(nb)
+            scc.append(connected)
+
+        return scc
 
 if __name__ == "__main__":
     dg = DirectedGraph({1: {2,3}, 2: {4, 5}, 3: {6}, 4: {7}, 5: {7}, 6: {5, 7}, 7:{2}})
