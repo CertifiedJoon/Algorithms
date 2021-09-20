@@ -21,7 +21,7 @@ class DirectedGraph:
         parents = {src: None}
         frontier = [src]
         i = 1
-        level = {s : 0}
+        level = {src : 0}
         
         while frontier: 
             next_step = []
@@ -66,6 +66,7 @@ class DirectedGraph:
             if s not in parents:
                 parents[s] = None
                 self.dfs_visit(s, parents)
+        return parents
         
     def dfs_visit(self, s, parents):
         for vertex in self._adjacency_list[s]:
@@ -73,7 +74,7 @@ class DirectedGraph:
                 parents[vertex] = s 
                 self.dfs_visit(vertex, parents)
                 
-    def contains_cycle(self, 1):
+    def contains_cycle(self):
         to_visit = []
         visited = set()
         popped = set()
@@ -81,7 +82,7 @@ class DirectedGraph:
             to_visit.append(s)
             while to_visit:
                 anc = to_visit.pop()
-                popped.append(anc)
+                popped.add(anc)
                 for chd in self._adjacency_list[anc]:
                     if chd in popped:
                         return True
@@ -92,19 +93,31 @@ class DirectedGraph:
     def topological_sort(self):
         order = []
         visited = set()
-        for s in self:
-            to_visit.append(s)
+        for vertex in self._adjacency_list.keys():
+            if vertex in visited:
+                continue
+            to_visit = [vertex]
             while to_visit:
-                anc = to_visit.pop()
-                order.append(anc)
-                for chd in self._adjacency_list[anc]:
-                    if chd not in visited:
-                        to_visit.append(chd)
+                pop = to_visit.pop()
+                order.append(pop)
+                visited.add(pop)
+                if pop in visited:
+                    continue
+                for nb in self._adjacency_list[pop]:
+                    to_visit.append(pop)
+        order.reverse()
         return order
+    
+    def reverse_adj_list(self):
+        reversed_list = defaultdict(set)
+        for vertex, neighbors in self._adjacency_list.items():
+            for nb in neighbors:
+                reversed_list[nb].add(vertex)
+        return reversed_list
     
     def korasaju_scc(self):
         order = self.topological_sort()
-        reversed_graph = self.reversed()
+        reversed_graph = self.reverse_adj_list()
         visited = set()
         scc = []
         
@@ -112,23 +125,27 @@ class DirectedGraph:
             connected = []
             vertex = order.pop()
             visited.add(vertex)
-            dfs_q = queue.Queue()
-            dfs_q.put(vertex)
-            while dfs_q:
-                poped = dfs_q.get()
+            dfs_stack = []
+            dfs_stack.append(vertex)
+            while dfs_stack:
+                poped = dfs_stack.pop()
+                if poped in visited:
+                    continue
+                else:
+                    visited.add(poped)
                 connected.append(poped)
                 for nb in reversed_graph[poped]:
                     if nb not in visited:
-                        dfs_q.put(nb)
-                        visited.add(nb)
+                        dfs_stack.append(nb)
             scc.append(connected)
 
         return scc
 
 if __name__ == "__main__":
     dg = DirectedGraph({1: {2,3}, 2: {4, 5}, 3: {6}, 4: {7}, 5: {7}, 6: {5, 7}, 7:{2}})
-    print(dg.bfs())
+    print(dg.bfs(1))
     print(dg.dfs())
     print(dg.rec_dfs())
     print(dg.contains_cycle())
     print(dg.topological_sort())
+    print(dg.korasaju_scc())
