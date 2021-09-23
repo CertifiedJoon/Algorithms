@@ -75,19 +75,25 @@ class DirectedGraph:
                 self.dfs_visit(vertex, parents)
                 
     def contains_cycle(self):
-        to_visit = []
-        visited = set()
-        popped = set()
-        for s in self:
-            to_visit.append(s)
+        STATUS_STARTED = 1
+        STATUS_FINISHED = 2
+        statuses = {}
+        for vertex in self._adjacency_list.keys():
+            to_visit = [vertex]
             while to_visit:
-                anc = to_visit.pop()
-                popped.add(anc)
-                for chd in self._adjacency_list[anc]:
-                    if chd in popped:
-                        return True
-                    if chd not in visited:
-                        to_visit.append(chd)
+                v = to_visit.pop()
+                if v in statuses:
+                    if statuses[v] == STATUS_STARTED:
+                        statuses[v] = STATUS_FINISHED
+                else:
+                    to_visit.append()
+                
+                for nb in self._adjacency_list[v]:
+                    if nb in statuses:
+                        if statuses[eligible] = STATUS_STARTED:
+                            return True
+                    else:
+                        to_visit.append(v)
         return False
     
     def topological_sort(self):
@@ -142,7 +148,7 @@ class DirectedGraph:
         return scc
 
 if __name__ == "__main__":
-    dg = DirectedGraph({1: {2,3}, 2: {4, 5}, 3: {6}, 4: {7}, 5: {7}, 6: {5, 7}, 7:{2}})
+    dg = DirectedGraph({1: {2,3}, 2: {4, 5}, 3: {6}, 4: {7}, 5: {7}, 6: {5, 7}, 7:{}})
     print(dg.bfs(1))
     print(dg.dfs())
     print(dg.rec_dfs())
