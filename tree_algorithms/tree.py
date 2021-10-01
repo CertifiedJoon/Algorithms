@@ -1,4 +1,4 @@
-from collections import queue
+import queue
 class Tree:
     """Abstract base class representing a tree structure."""
 

@@ -1,4 +1,4 @@
-from .binary_tree import BinaryTree
+from binary_tree import BinaryTree
 class LinkedBinaryTree(BinaryTree):
     """Linked representation of a binary tree structure."""
 
@@ -170,3 +170,78 @@ class LinkedBinaryTree(BinaryTree):
             node._right = t2._root
             t2._root = None
             t2._size = 0
+            
+    def list_by_depth(self):
+        """create a list of lists of element in same depth"""
+        
+    def _rec_list_by_depth(self, p, depth, l):
+        """Create a list of lists of elements in same depth by recursion"""
+        if not p:
+            return
+        if depth >= len(l):
+            l.append([])
+        l[depth].append(p.element())
+        self._rec_list_by_depth(p.left(), depth + 1, l)
+        self._rec_list_by_depth(p.right(), depth + 1, l)
+    
+    def _bfs_list_by_depth(self):
+        """Create a list of list of elements in same depth by bfs"""
+        ret = []
+        current =[self.root()]
+        while current:
+            ret.append([c.element() for c in current])
+            parents = current
+            current = []
+            for parent in parents:
+                if self.left(parent):
+                    current.append(self.left(parent))
+                if self.right(parent):
+                    current.append(self.right(parent))
+        return ret
+    
+    def is_balanced(self):
+        """check if the tree is balanced"""
+        return False if self._rec_is_balanced(self.root()) == float('-inf') else True
+    
+    def _rec_is_balanced(self, p):
+        if p is None:
+            return -1
+        if self.is_leaf(p):
+            return 0
+        height_left = self._rec_is_balanced(self.left(p))
+        height_right = self._rec_is_balanced(self.right(p))
+        if abs(height_left - height_right) > 1:
+            return float('-inf')
+        return 1 + max(height_left, height_right)
+    
+    def is_bst(self):
+        """Wrapper classs for self._rec_is_bst(p)"""
+        return self._rec_is_bst(self.root())
+    
+    def _rec_is_bst(self, p):
+        """Determine whether or not the tree is a binary search tree"""
+        if self.is_empty():
+            raise ValueError('Tree is empty')
+        if self.is_leaf(p):
+            return True
+        elif not self.left(p) and self.right(p).element() > p.element():
+            return self._rec_is_bst(self.right(p))
+        elif not self.right(p) and self.left(p).element() < p.element():
+            return self._rec_is_bst(self.left(p))
+        elif self.left(p).element() < p.element() and self.right(p).element() > p.element():
+            return self._rec_is_bst(self.left(p)) and self._rec_is_bst(self.right(p))
+        else:
+            return False
+    
+    def inorder_successor(self, p):
+        if not isinstance(p, self.Position):
+            return ValueError('p is None')
+        successor = p
+        if not self.right(p):
+            while(successor and successor.element() < p.element()):
+                successor = self.parent(p)
+        else:
+            successor = self.right(successor)
+            while(self.left(successor)):
+                successor = self.left(successor)
+        return successor
