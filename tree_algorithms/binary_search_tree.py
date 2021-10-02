@@ -37,9 +37,10 @@ class BinarySearchTree(LinkedBinaryTree):
             
 
 if __name__ == "__main__":
-    bst = BinarySearchTree([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19])
+    bst = BinarySearchTree([1,2,3,4,5,6,7])
     bst.preorder_indented()
-    print(bst.is_balanced())
-    print(bst._bfs_list_by_depth())
-    print(bst.is_bst())
-    print(bst.inorder_successor(bst.root()).element())
+    # print(bst.is_balanced())
+    # print(bst._bfs_list_by_depth())
+    # print(bst.is_bst())
+    # print(bst.inorder_successor(bst.root()).element())
+    print(bst.possible_sequences())

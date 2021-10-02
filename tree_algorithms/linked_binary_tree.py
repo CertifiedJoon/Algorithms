@@ -234,6 +234,7 @@ class LinkedBinaryTree(BinaryTree):
             return False
     
     def inorder_successor(self, p):
+        """Find inorder successor of a node at position p"""
         if not isinstance(p, self.Position):
             return ValueError('p is None')
         successor = p
@@ -245,3 +246,37 @@ class LinkedBinaryTree(BinaryTree):
             while(self.left(successor)):
                 successor = self.left(successor)
         return successor
+    
+    def common_ancestor(self, p1, p2):
+        """Finds the first common ancestor of two nodes given by position p1 and p 2"""
+        p1_depth = self.depth(p1)
+        p2_depth = self.depth(p2)
+        deep, shallow = (p1,p2) if p1_depth > p2_depth else (p2, p1)
+        for _ in range (abs(p1_depth - p2_depth)):
+            shallow = self.parent(shallow)
+        while (deep and shallow):
+            if deep == shallow:
+                return shallow
+            else:
+                deep = self.parent(deep)
+                shallow = self.parent(shallow)
+        return None
+    
+    def possible_sequences(self):
+        ret = [sequence for sequence in self._permute([self.root()], [])]
+        return ret
+    
+    def _permute(self, remaining, sofar):
+        if not remaining:
+            yield sofar
+        else:
+            p = remaining[0]
+            to_add = [c for c in self.children(p) if c != None]
+            print(remaining[1:0] + to_add)
+            self._permute(remaining[1:] + to_add, sofar + [p.element()])
+            to_add.reverse()
+            self._permute(remaining[1:] + to_add, sofar + [p.element()])
+            if self.left(p):
+                self._permute(remaining[1:] + [self.left(p)], sofar + [p.element()])
+            if self.right(p):
+                self._permute(remaining[1:] + [self.right(p)], sofar + [p.element()])
