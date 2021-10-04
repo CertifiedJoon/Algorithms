@@ -54,7 +54,8 @@ class BinarySearchTree(LinkedBinaryTree):
         return ret_backtracked            
 
 if __name__ == "__main__":
-    bst = BinarySearchTree([-1,-3,-5,-6,-9,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18])
+    bst = BinarySearchTree([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17])
     bst.preorder_indented()
+    print(bst.count_path_sum(6))
     for i in range(1, 20):
         print(f"{i} has {bst.count_path_sum(i)} paths")

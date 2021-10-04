@@ -297,20 +297,20 @@ class LinkedBinaryTree(BinaryTree):
             return 0
         cnt = 0
         # @pysnooper.snoop()
-        def backtracking(p, sum_sofar, path=False):
+        def backtracking(p, path_sums):
             """backtracking method for summing the nodes. path variable allows the backtracking function to know if path has already been visited"""
             nonlocal cnt
-            if p is None: 
+            if p is None:
                 return
-            new_sum = sum_sofar + p.element()
-            if new_sum == k and path:
-                cnt += 1
+            
+            new_sum = [c + p.element() for c in path_sums]
+            new_sum.append(p.element())
+            cnt += new_sum[:-1].count(k)
+            
             if self.left(p):
-                backtracking(self.left(p), new_sum, path=True)
-                backtracking(self.left(p), 0)
+                backtracking(self.left(p), new_sum)
             if self.right(p):
-                backtracking(self.right(p), new_sum, path=True)
-                backtracking(self.right(p), 0)
+                backtracking(self.right(p), new_sum)
                 
-        backtracking(self.root(), 0)
+        backtracking(self.root(), [])
         return cnt
