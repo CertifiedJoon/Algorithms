@@ -34,13 +34,27 @@ class BinarySearchTree(LinkedBinaryTree):
             else:
                 curr = self.right(curr)
         self._add_left(parent, element) if element < parent.element() else self._add_right(parent, element)
-            
+        
+    def get_all_sequences(self):
+        if self.is_empty():
+            return []
+        ret_backtracked = []
+        def backtracking(choices, sofar):
+            if not choices:
+                ret_backtracked.append(sofar)
+                return
+            for i in range(len(choices)):
+                new_choices = choices[:i] + choices[i+1:]
+                if self.left(choices[i]):
+                    new_choices.append(self.left(choices[i]))
+                if self.right(choices[i]):
+                    new_choices.append(self.right(choices[i]))
+                backtracking(new_choices, sofar + [choices[i].element()])
+        backtracking([self.root()], [])
+        return ret_backtracked            
 
 if __name__ == "__main__":
-    bst = BinarySearchTree([1,2,3,4,5,6,7])
+    bst = BinarySearchTree([-1,-3,-5,-6,-9,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18])
     bst.preorder_indented()
-    # print(bst.is_balanced())
-    # print(bst._bfs_list_by_depth())
-    # print(bst.is_bst())
-    # print(bst.inorder_successor(bst.root()).element())
-    print(bst.possible_sequences())
+    for i in range(1, 20):
+        print(f"{i} has {bst.count_path_sum(i)} paths")

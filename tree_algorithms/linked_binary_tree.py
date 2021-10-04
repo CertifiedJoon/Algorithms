@@ -1,4 +1,7 @@
 from binary_tree import BinaryTree
+import random
+import queue
+import pysnooper
 class LinkedBinaryTree(BinaryTree):
     """Linked representation of a binary tree structure."""
 
@@ -262,21 +265,52 @@ class LinkedBinaryTree(BinaryTree):
                 shallow = self.parent(shallow)
         return None
     
-    def possible_sequences(self):
-        ret = [sequence for sequence in self._permute([self.root()], [])]
-        return ret
+    def check_subtree(self, root1, root2):
+        """checks if root2 is a subtree of root2"""
+        if not root1 or not root2:
+            return False
+        curr = root2
+        while curr:
+            if curr == root1:
+                return True
+            curr = self.parent(curr)
+        return False
     
-    def _permute(self, remaining, sofar):
-        if not remaining:
-            yield sofar
-        else:
-            p = remaining[0]
-            to_add = [c for c in self.children(p) if c != None]
-            print(remaining[1:0] + to_add)
-            self._permute(remaining[1:] + to_add, sofar + [p.element()])
-            to_add.reverse()
-            self._permute(remaining[1:] + to_add, sofar + [p.element()])
+    def randnode(self):
+        """gets random node from the tree"""
+        r = random.randrange(len(self))
+        q = queue.Queue()
+        q.put(self.root())
+        while q:  
+            n = q.get()
+            if not r:
+                return n
+            r -= 1
+            for c in self.children(n):
+                if c:
+                    q.put(c)
+        return None
+    
+    def count_path_sum(self, k):
+        """Counts how many paths(a link of two nodes or more) sum to k"""
+        if self.is_empty():
+            return 0
+        cnt = 0
+        # @pysnooper.snoop()
+        def backtracking(p, sum_sofar, path=False):
+            """backtracking method for summing the nodes. path variable allows the backtracking function to know if the the sum is made of a single node or more than one node"""
+            nonlocal cnt
+            if p is None: 
+                return
+            new_sum = sum_sofar + p.element()
+            if new_sum == k and path:
+                cnt += 1
             if self.left(p):
-                self._permute(remaining[1:] + [self.left(p)], sofar + [p.element()])
+                backtracking(self.left(p), new_sum, path=True)
+                backtracking(self.left(p), 0)
             if self.right(p):
-                self._permute(remaining[1:] + [self.right(p)], sofar + [p.element()])
+                backtracking(self.right(p), new_sum, path=True)
+                backtracking(self.right(p), 0)
+                
+        backtracking(self.root(), 0)
+        return cnt
