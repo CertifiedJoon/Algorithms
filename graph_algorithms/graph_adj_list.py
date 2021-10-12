@@ -3,6 +3,7 @@ import time
 from collections import defaultdict
 import random
 import unittest
+import pysnooper
 
 class DirectedGraph:
     def __init__(self, adj = None):
@@ -73,12 +74,13 @@ class DirectedGraph:
             if vertex not in parents:
                 parents[vertex] = s 
                 self.dfs_visit(vertex, parents)
-                
+    
+    @pysnooper.snoop()
     def contains_cycle(self):
         STATUS_STARTED = 1
         STATUS_FINISHED = 2
-        statuses = {}
         for vertex in self._adjacency_list.keys():
+            statuses = {}
             to_visit = [vertex]
             while to_visit:
                 v = to_visit.pop()
@@ -86,33 +88,34 @@ class DirectedGraph:
                     if statuses[v] == STATUS_STARTED:
                         statuses[v] = STATUS_FINISHED
                 else:
-                    to_visit.append()
+                    statuses[v] = STATUS_STARTED
+                    to_visit.append(v)
                 
                 for nb in self._adjacency_list[v]:
                     if nb in statuses:
-                        if statuses[eligible] = STATUS_STARTED:
+                        if statuses[nb] == STATUS_STARTED:
                             return True
                     else:
-                        to_visit.append(v)
+                        to_visit.append(nb)
         return False
     
-    def topological_sort(self):
-        order = []
-        visited = set()
-        for vertex in self._adjacency_list.keys():
-            if vertex in visited:
-                continue
-            to_visit = [vertex]
-            while to_visit:
-                pop = to_visit.pop()
-                order.append(pop)
-                visited.add(pop)
-                if pop in visited:
-                    continue
-                for nb in self._adjacency_list[pop]:
-                    to_visit.append(pop)
-        order.reverse()
-        return order
+    # def topological_sort(self):
+    #     order = []
+    #     visited = set()
+    #     for vertex in self._adjacency_list.keys():
+    #         if vertex in visited:
+    #             continue
+    #         to_visit = [vertex]
+    #         while to_visit:
+    #             pop = to_visit.pop()
+    #             order.append(pop)
+    #             visited.add(pop)
+    #             if pop in visited:
+    #                 continue
+    #             for nb in self._adjacency_list[pop]:
+    #                 to_visit.append(pop)
+    #     order.reverse()
+    #     return order
     
     def reverse_adj_list(self):
         reversed_list = defaultdict(set)
@@ -135,7 +138,7 @@ class DirectedGraph:
             dfs_stack.append(vertex)
             while dfs_stack:
                 poped = dfs_stack.pop()
-                if poped in visited:
+                if poped in visited:        
                     continue
                 else:
                     visited.add(poped)
@@ -149,9 +152,9 @@ class DirectedGraph:
 
 if __name__ == "__main__":
     dg = DirectedGraph({1: {2,3}, 2: {4, 5}, 3: {6}, 4: {7}, 5: {7}, 6: {5, 7}, 7:{}})
-    print(dg.bfs(1))
-    print(dg.dfs())
-    print(dg.rec_dfs())
+    # print(dg.bfs(1))
+    # print(dg.dfs())
+    # print(dg.rec_dfs())
     print(dg.contains_cycle())
-    print(dg.topological_sort())
-    print(dg.korasaju_scc())
+    # print(dg.topological_sort())
+    # print(dg.korasaju_scc())
