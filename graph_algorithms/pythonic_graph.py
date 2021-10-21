@@ -80,16 +80,6 @@ class Graph:
         u, v = edge.end_points()
         del self._outgoing[u][v]
         del self._incoming[v][u]
-        
-    def transposed(self):
-        import copy
-        tp = copy.deepcopy(self)
-        for edge in self.edges():
-            u, v = edge.end_points()
-            tp.insert_edge(u, v, edge.element())
-            tp.remove_edge(edge)
-        return tp
-
 
 def topological_sort(g):
     incount = {}
@@ -116,38 +106,26 @@ def fill_order(g, u, stack, visited):
         if v not in visited:
             fill_order(g, v, stack, visited)
     stack.append(u)
-    
-def transposed(g): 
-    """Need a clever way of transposing"""
-    tp = Graph(True)
-    for edge in g.edges():
-        u, v  = edge.end_points()
-        
-        origin = tp.insert_vertex(u.element())
-        dest = tp.insert_vertex(v.element())
-        tp.insert_edge(dest, origin, edge.element())
-    return tp
 
-def dfs(g, u, order, visited):
-    order.append(u)
+def dfs_back(g, u, order, visited):
+    order.append(u.element())
     visited.add(u)
-    for edge in g.incident_edges(u):
+    for edge in g.incident_edges(u, False):
         v = edge.opposite(u)
         if v not in visited:
-            dfs(g, v, order, visited)
+            dfs_back(g, v, order, visited)
 
 def kosaraju(g, u):
     stack = []
     scc = []
     visited = set()
     fill_order(g, u, stack, set())
-    tp = g.transposed()
     while stack:
         connected = []
         u = stack.pop()
         if u not in visited:
             visited.add(u)
-            dfs(tp, u, connected, set())
+            dfs_back(g, u, connected, visited)
             scc.append(connected)
     return scc
                 
