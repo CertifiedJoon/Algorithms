@@ -128,7 +128,85 @@ def kosaraju(g, u):
             dfs_back(g, u, connected, visited)
             scc.append(connected)
     return scc
-                
+
+import queue
+
+class Parition:
+    class Position:
+        __slots__ = '_container', '_size', '_element', '_parent'
+        def __init__(self, container, element):
+            self._container = container
+            self._size = 1
+            self._element = element
+            self._parent = self
+        def element(self):
+            return self._element
+    
+    def make_position(self, v):
+        return self.Position(self, v)
+    
+    def find(self, v):
+        if v != v._parent:
+            self.find(v._parent)
+        return v
+
+    def union(p, q):
+        a = self.find(p)
+        b = self.find(q)
+        if a is not b:
+            if a._size > b._size:
+                b._parent = a
+                a._size += b._size
+            else:
+                a._parent = b
+                b._size += a._size
+
+def kruskal(g):
+    tree = []
+    forest = Partition()
+    position = {}
+    pq = queue.PriorityQueue()
+    for v in g.vertices():
+        position[v] = forest.make_position(v)
+    for edge in g.edges():
+        pq.put(edge.element(), edge)
+    size = g.vertex_count()
+    while len(tree) != size - 1 and pq:
+        weight, edge = pq.get()
+        u, v = edge.end_points()
+        a = forest.find(position[u])
+        b = forest.find(position[v])
+        if a is not b:
+            tree.append(edge)
+            forest.union(a, b)
+    return tree
+
+def prim_mst(g):
+    tree = []
+    d = {}
+    pq = AdaptablePriorityQueue()
+    pqlocator = {}
+    for v in g.vertices():
+        if not d:
+            d[v] = 0
+        else:
+            d[v] = float('inf')
+        pq.put(d[v],(v, None))
+    while pq:
+        key, val = pq.get()
+        u, edge = val
+        del pqlocator[v]
+        if edge is not None:
+            tree.append(edge)
+        for link in g.incident_edges(u):
+            v = link.opposite(u)
+            if v in pqlocator:
+                if d[v] < v.element():
+                    d[v] = v.element()
+                    pq.update(pqlocator[v], d[v], (v, link))
+    return tree
+
+
 
 if __name__ == "__main__":
     g = Graph(True)
