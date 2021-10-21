@@ -99,23 +99,23 @@ class DirectedGraph:
                         to_visit.append(nb)
         return False
     
-    # def topological_sort(self):
-    #     order = []
-    #     visited = set()
-    #     for vertex in self._adjacency_list.keys():
-    #         if vertex in visited:
-    #             continue
-    #         to_visit = [vertex]
-    #         while to_visit:
-    #             pop = to_visit.pop()
-    #             order.append(pop)
-    #             visited.add(pop)
-    #             if pop in visited:
-    #                 continue
-    #             for nb in self._adjacency_list[pop]:
-    #                 to_visit.append(pop)
-    #     order.reverse()
-    #     return order
+    def topological_sort(self):
+        order = []
+        visited = set()
+        for vertex in self._adjacency_list.keys():
+            if vertex in visited:
+                continue
+            to_visit = [vertex]
+            while to_visit:
+                pop = to_visit.pop()
+                order.append(pop)
+                visited.add(pop)
+                if pop in visited:
+                    continue
+                for nb in self._adjacency_list[pop]:
+                    to_visit.append(pop)
+        order.reverse()
+        return order
     
     def reverse_adj_list(self):
         reversed_list = defaultdict(set)
@@ -155,6 +155,6 @@ if __name__ == "__main__":
     # print(dg.bfs(1))
     # print(dg.dfs())
     # print(dg.rec_dfs())
-    print(dg.contains_cycle())
+    # print(dg.contains_cycle())
     # print(dg.topological_sort())
-    # print(dg.korasaju_scc())
+    print(dg.korasaju_scc())

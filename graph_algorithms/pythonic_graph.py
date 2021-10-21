@@ -76,6 +76,21 @@ class Graph:
         self._outgoing[v][u] = edge
         self._incoming[u][v] = edge
         
+    def remove_edge(self, edge):
+        u, v = edge.end_points()
+        del self._outgoing[u][v]
+        del self._incoming[v][u]
+        
+    def transposed(self):
+        import copy
+        tp = copy.deepcopy(self)
+        for edge in self.edges():
+            u, v = edge.end_points()
+            tp.insert_edge(u, v, edge.element())
+            tp.remove_edge(edge)
+        return tp
+
+
 def topological_sort(g):
     incount = {}
     topo = []
@@ -94,6 +109,49 @@ def topological_sort(g):
                 ready.append(v)
     return topo
 
+def fill_order(g, u, stack, visited):
+    visited.add(u)
+    for edge in g.incident_edges(u):
+        v = edge.opposite(u)
+        if v not in visited:
+            fill_order(g, v, stack, visited)
+    stack.append(u)
+    
+def transposed(g): 
+    """Need a clever way of transposing"""
+    tp = Graph(True)
+    for edge in g.edges():
+        u, v  = edge.end_points()
+        
+        origin = tp.insert_vertex(u.element())
+        dest = tp.insert_vertex(v.element())
+        tp.insert_edge(dest, origin, edge.element())
+    return tp
+
+def dfs(g, u, order, visited):
+    order.append(u)
+    visited.add(u)
+    for edge in g.incident_edges(u):
+        v = edge.opposite(u)
+        if v not in visited:
+            dfs(g, v, order, visited)
+
+def kosaraju(g, u):
+    stack = []
+    scc = []
+    visited = set()
+    fill_order(g, u, stack, set())
+    tp = g.transposed()
+    while stack:
+        connected = []
+        u = stack.pop()
+        if u not in visited:
+            visited.add(u)
+            dfs(tp, u, connected, set())
+            scc.append(connected)
+    return scc
+                
+
 if __name__ == "__main__":
     g = Graph(True)
     v1 = g.insert_vertex(1)
@@ -104,10 +162,12 @@ if __name__ == "__main__":
     v6 = g.insert_vertex(6)
     
     g.insert_edge(v1, v2, 1)
-    g.insert_edge(v1, v3, 1)
+    g.insert_edge(v2, v3, 1)
+    g.insert_edge(v3, v1, 1)
     g.insert_edge(v2, v4, 1)
-    g.insert_edge(v4, v3, 1)
-    g.insert_edge(v4, v6, 1)
+    g.insert_edge(v4, v5, 1)
     g.insert_edge(v5, v6, 1)
+    g.insert_edge(v6, v4, 1)
     
-    print([v.element() for v in topological_sort(g)])
+    # print([v.element() for v in topological_sort(g)])
+    print(kosaraju(g, v1))
