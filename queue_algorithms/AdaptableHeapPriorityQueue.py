@@ -1,4 +1,4 @@
-from ./HeapPriorityQueue import HeapPriorityQueue
+from .HeapPriorityQueue import HeapPriorityQueue
 
 class AdaptableHeapPriorityQueue(HeapPriorityQueue):
     class Locator(HeapPriorityQueue._Item):

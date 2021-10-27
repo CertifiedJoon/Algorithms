@@ -1,4 +1,4 @@
-from ./PriorityQueueBase import PriorityQueueBase
+from .PriorityQueueBase import PriorityQueueBase
 class HeapPriorityQueue(PriorityQueueBase):
     def _parent(self, j):
         return (j - 1) // 2
