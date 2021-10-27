@@ -80,16 +80,6 @@ class Graph:
         u, v = edge.end_points()
         del self._outgoing[u][v]
         del self._incoming[v][u]
-        
-    def transposed(self):
-        import copy
-        tp = copy.deepcopy(self)
-        for edge in self.edges():
-            u, v = edge.end_points()
-            tp.insert_edge(u, v, edge.element())
-            tp.remove_edge(edge)
-        return tp
-
 
 def topological_sort(g):
     incount = {}
@@ -116,42 +106,188 @@ def fill_order(g, u, stack, visited):
         if v not in visited:
             fill_order(g, v, stack, visited)
     stack.append(u)
-    
-def transposed(g): 
-    """Need a clever way of transposing"""
-    tp = Graph(True)
-    for edge in g.edges():
-        u, v  = edge.end_points()
-        
-        origin = tp.insert_vertex(u.element())
-        dest = tp.insert_vertex(v.element())
-        tp.insert_edge(dest, origin, edge.element())
-    return tp
 
-def dfs(g, u, order, visited):
-    order.append(u)
+def dfs_back(g, u, order, visited):
+    order.append(u.element())
     visited.add(u)
-    for edge in g.incident_edges(u):
+    for edge in g.incident_edges(u, False):
         v = edge.opposite(u)
         if v not in visited:
-            dfs(g, v, order, visited)
+            dfs_back(g, v, order, visited)
 
 def kosaraju(g, u):
     stack = []
     scc = []
     visited = set()
     fill_order(g, u, stack, set())
-    tp = g.transposed()
     while stack:
         connected = []
         u = stack.pop()
         if u not in visited:
             visited.add(u)
-            dfs(tp, u, connected, set())
+            dfs_back(g, u, connected, visited)
             scc.append(connected)
     return scc
-                
 
+import queue
+
+class Parition:
+    class Position:
+        __slots__ = '_container', '_size', '_element', '_parent'
+        def __init__(self, container, element):
+            self._container = container
+            self._size = 1
+            self._element = element
+            self._parent = self
+        def element(self):
+            return self._element
+    
+    def make_position(self, v):
+        return self.Position(self, v)
+    
+    def find(self, v):
+        if v != v._parent:
+            self.find(v._parent)
+        return v
+
+    def union(p, q):
+        a = self.find(p)
+        b = self.find(q)
+        if a is not b:
+            if a._size > b._size:
+                b._parent = a
+                a._size += b._size
+            else:
+                a._parent = b
+                b._size += a._size
+
+def kruskal(g):
+    tree = []
+    forest = Partition()
+    position = {}
+    pq = queue.PriorityQueue()
+    for v in g.vertices():
+        position[v] = forest.make_position(v)
+    for edge in g.edges():
+        pq.put(edge.element(), edge)
+    size = g.vertex_count()
+    while len(tree) != size - 1 and pq:
+        weight, edge = pq.get()
+        u, v = edge.end_points()
+        a = forest.find(position[u])
+        b = forest.find(position[v])
+        if a is not b:
+            tree.append(edge)
+            forest.union(a, b)
+    return tree
+
+def prim_mst(g):
+    tree = []
+    d = {}
+    pq = AdaptablePriorityQueue()
+    pqlocator = {}
+    for v in g.vertices():
+        if not d:
+            d[v] = 0
+        else:
+            d[v] = float('inf')
+        pq.put(d[v],(v, None))
+    while pq:
+        key, val = pq.get()
+        u, edge = val
+        del pqlocator[v]
+        if edge is not None:
+            tree.append(edge)
+        for link in g.incident_edges(u):
+            v = link.opposite(u)
+            if v in pqlocator:
+                if d[v] < v.element():
+                    d[v] = v.element()
+                    pq.update(pqlocator[v], d[v], (v, link))
+    return tree
+
+def dijkstra(g, s):
+    d = {}
+    pq = AdaptablePriorityQueue()
+    pqlocator = {}
+    anc = {}
+    for v in g.vertices():
+        if v is s:
+            d[v] = 0
+        else:
+            d[v] = float('inf')
+        pqlocator = pq.put(d[v], v)
+        anc[v] = None
+    while pq:
+        u = pq.get()
+        del pqlocator[u]
+        for edge in g.incident_edges(u):
+            v = edge.opposite(u)
+            if d[v] > d[u] + edge.element():
+                d[v] = d[u] + edge.element()
+                anc[v] = u
+                pq.update(pqlocator[v], d[v], v)
+    return anc, d
+
+def bellman_ford(g, s):
+    d  = {}
+    anc = {}
+    for v in g.vertices():
+        if v is s:
+            d[v] = 0
+        else:
+            d[v] = float('inf')
+        anc[v] = None
+    for _ in range(g.vertex_count()):
+        for u in g.vertices():
+            for edge in g.incident_edges(u):
+                v = edge.opposite(u)
+                if d[v] > d[u] + edge.element():
+                    d[v] = d[u] + edge.element()
+                    anc[v] = u
+    for u in g.vertices():
+        for edge in g.incident_edges(u):
+            v = edge.opposite(u)
+            if d[v] > d[u] + edge.element():
+                raise RuntimeError("Negative cycle detected")
+    return anc, d
+
+def contains_cycle(g):
+    STATUS_STARTED = 1
+    STATUS_FINISHED = 2
+    for vertex in g.vertices():
+        statuses = {}
+        to_visit = [vertex]
+        while to_visit:
+            u = to_visit.pop()
+            if u in statuses:
+                if statuses[u] == STATUS_STARTED:
+                    statuses[u] = STATUS_FINISHED
+            else:
+                statuses[u] = STATUS_STARTED
+                to_visit.append(u)
+            for edge in g.incident_edges(u):
+                v = edge.opposite(u)
+                if v in statuses:
+                    if statuses[v] == STATUS_STARTED:
+                        return True
+                else:
+                    to_visit.append(v)
+    return False
+
+def floyd_marshall(g):
+    closure = copy.deepcopy(g)
+    verts = list(g.vertices())
+    n = len(verts)
+    for k in range(n):
+        for i in range(n):
+            if i != k and closure.get_edge(verts[i], verts[k]) is not None:
+                for j in range(n):
+                    if i != k != j and closure.get_edge(verts[k], verts[j]) is not None:
+                        if closure.get_edge(verts[i], verts[j]):
+                            closure.insert_edge(verts[i], verts[j])
+    return closure
+    
 if __name__ == "__main__":
     g = Graph(True)
     v1 = g.insert_vertex(1)
