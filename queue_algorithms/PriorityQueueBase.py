@@ -1,7 +1,7 @@
 class PriorityQueueBase:
-    class __Item:
+    class _Item:
         __slots__ = '_key', '_value'
-        def __init__(key, value):
+        def __init__(self, key, value):
             self._key = key
             self._value = value
         
