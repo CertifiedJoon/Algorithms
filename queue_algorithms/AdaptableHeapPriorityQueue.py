@@ -9,8 +9,8 @@ class AdaptableHeapPriorityQueue(HeapPriorityQueue):
     
     def _swap(self, i, j):
         super()._swap(i, j)
-        self._data[i]._index = j
-        self._data[j]._index = i
+        self._data[i]._index = i
+        self._data[j]._index = j
     
     def _bubble(self, j):
         if j > 0 and self._data[j] < self._data[self._parent(j)]:
@@ -19,9 +19,9 @@ class AdaptableHeapPriorityQueue(HeapPriorityQueue):
             self._downheap(j)
     
     def add(self, k, v):
-        token = self.Locator(len(self), k, v)
+        token = self.Locator(len(self._data), k, v)
         self._data.append(token)
-        self._upheap(len(self) - 1)
+        self._upheap(len(self._data) - 1)
         return token
     
     def update(self, loc, k, v):
@@ -32,7 +32,7 @@ class AdaptableHeapPriorityQueue(HeapPriorityQueue):
         loc._value = v
         self._bubble(j)
     
-    def remove(sef, loc):
+    def remove(self, loc):
         j = loc._index
         if not (0 <= j < len(self._data) and self._data[j] is loc):
             raise ValueError('Invalid locator')
@@ -61,6 +61,6 @@ if __name__ == '__main__':
         q.update(last, 0, last._value)
         key, value = q.get_min()
         print(key, value)
-        q.remove(loc)
+        q.remove(last)
         key, value = q.get_min()
         print(key, value)
