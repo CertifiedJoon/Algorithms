@@ -1,7 +1,6 @@
 from binary_tree import BinaryTree
 import random
 import queue
-import pysnooper
 class LinkedBinaryTree(BinaryTree):
     """Linked representation of a binary tree structure."""
 
@@ -176,7 +175,9 @@ class LinkedBinaryTree(BinaryTree):
             
     def list_by_depth(self):
         """create a list of lists of element in same depth"""
-        
+        l = []
+        self._rec_list_by_depth(self.root(), 0, l)
+        return l
     def _rec_list_by_depth(self, p, depth, l):
         """Create a list of lists of elements in same depth by recursion"""
         if not p:
@@ -296,7 +297,6 @@ class LinkedBinaryTree(BinaryTree):
         if self.is_empty():
             return 0
         cnt = 0
-        # @pysnooper.snoop()
         def backtracking(p, path_sums):
             """backtracking method for summing the nodes. path variable allows the backtracking function to know if path has already been visited"""
             nonlocal cnt

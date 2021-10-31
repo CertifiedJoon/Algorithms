@@ -1,17 +1,24 @@
-from ../map_algorithms/MapBase import MapBase
-from ../tree_algorithms/linked_binary_tree import LinkedBinaryTree
+import random
+import sys 
+import os
+sys.path.append(os.path.abspath("/home/coder/Algorithms/map_algorithms"))
+from MapBase import MapBase
+sys.path.remove(os.path.abspath("/home/coder/Algorithms/map_algorithms"))
+sys.path.append(os.path.abspath("/home/coder/Algorithms/tree_algorithms"))
+from linked_binary_tree import LinkedBinaryTree
 
 class TreeMap(LinkedBinaryTree, MapBase):
     class Position(LinkedBinaryTree.Position):
         def key(self):
-            return self._element()._key
-        def element(self):
-            return self._element()._value
+            return self._node._element._key
+        def value(self):
+            return self._node._element._value
 
     def _subtree_search(self, p, k):
+        """ Searches subtree rooted at p for k. if k is not found, at a leaf node, return the leaf"""
         if p.key() == k:
             return p
-        elif p.key() < k:
+        elif k < p.key():
             if self.left(p) is not None:
                 return self._subtree_search(self.left(p), k)
         else:
@@ -20,24 +27,29 @@ class TreeMap(LinkedBinaryTree, MapBase):
         return p
 
     def _subtree_first_position(self, p):
+        """ Return the first inorder node of the subtree rooted at p """
         walk = p
         while self.left(walk) is not None:
             walk = self.left(walk)
         return walk
     
     def _subtree_last_position(self, p):
+        """ Return the last inorder node of the subtree rooted at p """
         walk = p 
         while self.right(walk) is  not None:
             walk = self._right(walk)
         return walk
     
     def first(self):
-        return self._subtree_first_position(self.root()) if len(self) > 0 else None:
+        """ Return the first inorder node of the whole tree """
+        return self._subtree_first_position(self.root()) if len(self) > 0 else None
     
     def last(self):
-        return self._subtree_last_position(self.root()) if len(self) > 0 else None:
+        """ Return the last inorder node of the whole tree """
+        return self._subtree_last_position(self.root()) if len(self) > 0 else None
         
     def before(self, p):
+        """ Return the inorder predecessor of the node p """
         self._validate(p)
         if self.left(p):
             return self._subtree_last_position(self.left(p))
@@ -50,26 +62,29 @@ class TreeMap(LinkedBinaryTree, MapBase):
             return above
         
     def after(self, p):
+        """ Return the inorder successor of the node p """
         self._validate(p)
-        if self._right(p):
-            return self._subtree_first_position(self.right(p)):
+        if self.right(p):
+            return self._subtree_first_position(self.right(p))
         else:
             walk = p 
             above = self.parent(walk)
             while above is not None and walk == self.right(above):
                 walk = above
-                above = self._parent(walk)
+                above = self.parent(walk)
             return above
         
     def find_position(self, k):
+        """ utilize _subtree_search to find the node with key k """
         if self.is_empty():
             return None
         else:
             p = self._subtree_search(self.root(), k)
-            self._rebalance_access(p)
+            self._rebalance_access(p) # rebalancing hook
             return p
     
     def find_min(self):
+        """ Sorted Map Abstraction for tree.first() """
         if self.is_empty():
             return  Npne
         else:
@@ -77,6 +92,7 @@ class TreeMap(LinkedBinaryTree, MapBase):
             return (p.key(), p.value())
     
     def find_ge(self, k):
+        """ Inexact Search for a node with a key that is greater to or equal to k """
         if self.is_empty():
             return None
         else:
@@ -86,6 +102,7 @@ class TreeMap(LinkedBinaryTree, MapBase):
             return (p.key(), p.value())
     
     def find_range(self, start = None, stop = None):
+        """ Returns a Range-like yields of nodes satisfying start <= node.key() < stop """
         if not self.is_empty():
             if start is None:
                 p = self.first()
@@ -94,10 +111,11 @@ class TreeMap(LinkedBinaryTree, MapBase):
                 if p.key() < start:
                     p = self.after(p)
             while p is not None and (stop is None or p.key() < stop):
-                yield(p.key(), p.vaue())
+                yield(p.key(), p.value())
                 p = self.after(p)
                 
     def __getitem__(self, k):
+        """ allows key indexing of sorted_map abstraction """
         if self.is_empty():
             raise KeyError('Key Error: ' + repr(k))
         else:
@@ -108,6 +126,7 @@ class TreeMap(LinkedBinaryTree, MapBase):
             return p.value()
     
     def __setitem__(self, k, v):
+        """ Allows changing of value, indexed by the key """
         if self.is_empty():
             leaf = self._add_root(self._Item(k, v))
         else:
@@ -124,13 +143,22 @@ class TreeMap(LinkedBinaryTree, MapBase):
                     leaf = self._add_left(p, item)
         self._rebalance_insert(leaf)
     
+    def items(self):
+        """ the sorted map abstraction that returns a tuple of key-value pair """
+        p = self.first()
+        while p is not None:
+            yield  (p.key(), p.value())
+            p = self.after(p)
+
     def __iter__(self):
-        p = self._first()
+        """ Iterates in inorder """
+        p = self.first()
         while p is not None:
             yield p.key()
             p = self.after(p)
     
     def delete(self, p):
+        """ Delete a node referenced by position p """
         self._validate(p)
         if self.left(p) and self.right(p):
             replacement = self._subtree_last_position(self.left(p))
@@ -141,6 +169,7 @@ class TreeMap(LinkedBinaryTree, MapBase):
         self._rebalance_delete(parent)
     
     def __delitem__(self, k):
+        """ allows del abstraction of the sorted_map structure """
         if not self.is_empty():
             p = self._subtree_search(self.root(), k)
             if p.key() == k:
@@ -153,3 +182,14 @@ class TreeMap(LinkedBinaryTree, MapBase):
     def _rebalance_delete(self, p): pass
     def _rebalance_access(self, p): pass
         
+if __name__ == "__main__":
+    rand = random.choices(range(20), k=10)
+    d = TreeMap()
+    for n in rand:
+        d[n] = n*n
+    for key, value in d.items():
+        print(key, value)
+    print(f"min: {d.find_min()}")
+    print(f"greater than or equal to 10: {d.find_ge(10)}")
+    for key, value in d.find_range(1, 10):
+        print(key, value)
