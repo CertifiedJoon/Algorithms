@@ -1,5 +1,5 @@
 from tree_map import TreeMap
-
+import random
 class AvlTreeMap(TreeMap):
     class _Node(TreeMap._Node):
         __slots__ = '_heights'
@@ -53,3 +53,20 @@ class AvlTreeMap(TreeMap):
     
     def _rebalance_access(self, p):
         self._rebalance(p)
+
+if __name__ == "__main__":
+    rand = random.choices(range(20), k=10)
+    d = TreeMap()
+    for n in rand:
+        d[n] = n*n
+    for key, value in d.items():
+        print(key, value)
+    print(f"min: {d.find_min()}")
+    print(f"greater than or equal to 10: {d.find_ge(10)}")
+    listed = d.list_by_depth()
+    for depth in listed:
+        for item in depth:
+            print(item._key, item._value, end="     ")
+        print("")
+    for key, value in d.find_range(1, 10):
+        print(key, value)

@@ -178,6 +178,7 @@ class LinkedBinaryTree(BinaryTree):
         l = []
         self._rec_list_by_depth(self.root(), 0, l)
         return l
+
     def _rec_list_by_depth(self, p, depth, l):
         """Create a list of lists of elements in same depth by recursion"""
         if not p:
@@ -185,8 +186,8 @@ class LinkedBinaryTree(BinaryTree):
         if depth >= len(l):
             l.append([])
         l[depth].append(p.element())
-        self._rec_list_by_depth(p.left(), depth + 1, l)
-        self._rec_list_by_depth(p.right(), depth + 1, l)
+        self._rec_list_by_depth(self.left(p), depth + 1, l)
+        self._rec_list_by_depth(self.right(p), depth + 1, l)
     
     def _bfs_list_by_depth(self):
         """Create a list of list of elements in same depth by bfs"""
