@@ -181,6 +181,42 @@ class TreeMap(LinkedBinaryTree, MapBase):
     def _rebalance_insert(self, p): pass
     def _rebalance_delete(self, p): pass
     def _rebalance_access(self, p): pass
+
+    def _relink(self, parent, child, make_left_child):
+        if make_left_child:
+            parent._left = child
+        else:
+            parent._right = child
+        if child is not None:
+            child._parent = parent
+
+    def _rotate(self, p):
+        x = p._node
+        y = x._parent
+        z = y._parent
+        if z is None:
+            self._root = x
+            x._parent = None
+        else:
+            self._relink(z, x, y == z._left)
+        
+        if x == y._right:
+            self._relink(x, y._right, True)
+            self._relink(x, y, False)
+        else:
+            self._relink(x, y._left, False)
+            self._relink(x, y, True) 
+        
+    def _restructure(self, x):
+        y = self.parent(x)
+        z = self.parent(y)
+        if (x == self.right(y)) == (y == self.right(z)):
+            self._rotate(y)
+            return y
+        else:
+            self._rotate(x)
+            self._rotate(x)
+            return x
         
 if __name__ == "__main__":
     rand = random.choices(range(20), k=10)
