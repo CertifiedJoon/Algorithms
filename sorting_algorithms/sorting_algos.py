@@ -56,6 +56,30 @@ def rec_quick_sort(s, l, r):
     rec_quick_sort(s, l, mid - 1)
     rec_quick_sort(s, mid + 1, r)
 
+def optimized_quick_sort(s):
+    inplace_quick_sort(s, 0, len(s) - 1)
+
+def inplace_quick_sort(s, a, b):
+    if a >= b:
+        return
+    left = a
+    pivot = s[b]
+    right = b - 1
+    while left <= right:
+        while left <= right and s[left] < pivot:
+            left += 1
+        while left <= right and pivot < s[right]:
+            right -= 1
+        if left <= right:
+            s[left], s[right] = s[right], s[left]
+            left, right = left + 1, right - 1
+    s[left], s[b] = s[b], s[left]
+    inplace_quick_sort(s, a, left - 1)
+    inplace_quick_sort(s, left + 1, b)
+
+def sort_default(s):
+    s.sort()
+
 import unittest
 import time
 import random
@@ -66,15 +90,17 @@ class Test(unittest.TestCase):
     test_functions = [
         merge_sort,
         bottom_up_merge_sort,
-        quick_sort
+        quick_sort,
+        optimized_quick_sort,
+        sort_default
     ]
     def test_sort(self):
         for _ in range(40):
-            arr = random.choices(range(100), k = 40)
+            arr = random.choices(range(100), k = 2000)
             expected = sorted(arr)
             self.test_cases.append((arr, expected))
         
-        num_runs = 250
+        num_runs = 10
         function_runtimes = defaultdict(float)
         for _ in range(num_runs):
             for arr, expected in self.test_cases:
