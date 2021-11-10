@@ -1,38 +1,55 @@
 import time
 import unittest
 from collections import defaultdict
+import random
 
-def max_profit(nums):
-    if not nums:
+def max_profit(prices):
+    if not prices:
         raise ValueError("empty list has been passed")
-    profit = 0
-    bought = nums[0]
-    for price in nums:
-        if bought > price:
-            profit = 0
-            bought = price
+    profits = [0] * len(prices)
+    bought = prices[0]
+    for i in range(len(prices)):
+        if prices[i] - bought < 0:
+            profits[i] = 0
+            bought = prices[i]
         else:
-            if profit < price - bought:
-                profit = price - bought
-    return profit
+            profits[i] = prices[i] - bought
+    return max(profits)
 
+def max_profit_optimized(prices):
+    if not prices:
+        raise ValueError("Empy list has been passed")
+    profit = 0
+    bought = prices[0]
+    for price in prices:
+        if price - bought <= 0:
+            bought = price
+        elif price -  bought > profit:
+            profit = price - bought
+    return profit
 
 
 class Test(unittest.TestCase):
     test_cases = [
         ([7,1,5,3,6,4], 5),
         ([7,6,4,3,1], 0), 
-        ([7,1,5,3,6,4,0], 0),
+        ([7,1,5,3,6,4,0], 5),
         ([7,1,5,3,6,4,0,6], 6),
         ([0], 0)
     ]
     test_functions = [
-        max_profit
+        max_profit,
+        max_profit_optimized
     ]
     
     def test_two_sums(self):
-        num_runs = 1000
+        num_runs = 10
+        num_cases = 1000
         function_runtimes = defaultdict(float)
+
+        for _ in range(num_cases):
+            arr = random.choices(range(100), k = random.randrange(1, 100))
+            self.test_cases.append((arr, max_profit(arr)))
 
         for _ in range(num_runs):
             for given, expected in self.test_cases:
