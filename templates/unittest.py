@@ -17,8 +17,8 @@ class Test(unittest.TestCase):
                 for solve in self.test_functions:
                     start = time.process_time()
                     assert(
-                        solve() == expected
-                    ),f"{solve.__name__} failed at {given[0], given[1]}"
+                        solve(given) == expected
+                    ),f"{solve.__name__} failed at {given}"
                     function_runtimes[solve.__name__] += (
                         time.process_time() - start
                     ) * 1000
