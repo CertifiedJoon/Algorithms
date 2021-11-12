@@ -200,11 +200,11 @@ class TreeMap(LinkedBinaryTree, MapBase):
         else:
             self._relink(z, x, y == z._left)
         
-        if x == y._right:
-            self._relink(x, y._right, True)
+        if x == y._left:
+            self._relink(y, x._right, True)
             self._relink(x, y, False)
         else:
-            self._relink(x, y._left, False)
+            self._relink(y, x._left, False)
             self._relink(x, y, True) 
         
     def _restructure(self, x):
