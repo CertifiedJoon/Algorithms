@@ -1,6 +1,7 @@
 import time
 import unittest
 from collections import defaultdict
+import random 
 
 class Test(unittest.TestCase):
     test_cases = [
@@ -8,7 +9,7 @@ class Test(unittest.TestCase):
     test_functions = [
     ]
     
-    def test_two_sums(self):
+    def test(self):
         num_runs = 1000
         function_runtimes = defaultdict(float)
 
