@@ -5,7 +5,7 @@ import random
 
 class Solution:
     def threeSumNoSort(self, nums):
-        res, dups = set{}, set{}
+        res, dups = set(), set()
         seen = {}
         for i, vali in enumerate(nums):
             if vali not in dups:

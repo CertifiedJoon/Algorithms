@@ -219,24 +219,15 @@ class LinkedBinaryTree(BinaryTree):
             return float('-inf')
         return 1 + max(height_left, height_right)
     
-    def is_bst(self):
-        """Wrapper classs for self._rec_is_bst(p)"""
-        return self._rec_is_bst(self.root())
-    
-    def _rec_is_bst(self, p):
-        """Determine whether or not the tree is a binary search tree"""
-        if self.is_empty():
-            raise ValueError('Tree is empty')
-        if self.is_leaf(p):
+    def isBST(self, root):
+        return self.recIsValidBST(root, float('-inf'), float('inf'))
+        
+    def recIsValidBST(self, root, lo, hi):
+        if not root:
             return True
-        elif not self.left(p) and self.right(p).element() > p.element():
-            return self._rec_is_bst(self.right(p))
-        elif not self.right(p) and self.left(p).element() < p.element():
-            return self._rec_is_bst(self.left(p))
-        elif self.left(p).element() < p.element() and self.right(p).element() > p.element():
-            return self._rec_is_bst(self.left(p)) and self._rec_is_bst(self.right(p))
-        else:
+        if root.val <= lo or root.val >= hi:
             return False
+        return self.recIsValidBST(root.left, lo, root.val) and self.recIsValidBST(root.right, root.val, hi)
     
     def inorder_successor(self, p):
         """Find inorder successor of a node at position p"""
