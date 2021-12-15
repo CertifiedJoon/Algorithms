@@ -1,18 +1,20 @@
 class Solution:
     def rotate(self, nums, k):
-        temp = nums[0]
         i = 0
-        while True:
-            swapi = (i + k) % len(nums)
-            print(nums[swapi], temp)
-            nums[swapi], temp = temp, nums[swapi]
-            i = swapi
-            if i == 0:
-                if len(nums) % k == 0:
-                    i += 1
-                    temp = nums[i + 1]
-                else: 
-                    break
+        moving = nums[i]
+        cnt = 0
+        front = 0
+        while cnt < len(nums):
+            i = (i + k) % len(nums)
+            nums[i], moving = moving, nums[i]
+            cnt += 1
+            if i == front:
+                front += 1
+                i = front
+                moving = nums[i]
+            print(nums)
+
+            
 
 s = Solution()
-print(s.rotate([-1,-100,3,99],))
+s.rotate([-1,-100,3,99], 2)
